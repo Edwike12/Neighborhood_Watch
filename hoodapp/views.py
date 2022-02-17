@@ -33,3 +33,12 @@ def update_profile(request,id):
     return render(request, 'update_profile.html', {"form":form})   
 
 
+#def hood
+@login_required(login_url='/accounts/login/')
+def hood(request):
+    return render(request)   
+
+#def join hood
+#create hood
+#exit hood
+#def all hoods in home
