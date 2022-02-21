@@ -5,37 +5,58 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-# Create your models here.
-#class neighborhood
-class NeighbourHood(models.Model):
+
+class Location(models.Model):
+    name = models.CharField(max_length=30)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+
+    def save_location(self):
+        self.save()
+
+    def __str__(self):
+        return self.name
+
+class NeighborHood(models.Model):
     name = models.CharField(max_length=50)
-    location = models.CharField(max_length=60)
-    admin = models.ForeignKey("Profile", on_delete=models.CASCADE, related_name='hood')
-    hood_logo = models.ImageField(upload_to='images/')
-    description = models.TextField()
-    health_tell = models.IntegerField(null=True, blank=True)
-    police_number = models.IntegerField(null=True, blank=True)
+    photo = CloudinaryField("image",null=True)
+    content = models.TextField(max_length=600, null=True)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE,null=True)
+    occupants_count = models.IntegerField(default=0)
+    user = models.ForeignKey(User, on_delete=models.CASCADE,null=True)
+    created_on = models.DateTimeField(auto_now_add=True,null=True)
+    updated_on = models.DateTimeField(auto_now=True,null=True)
+    health_cell = models.IntegerField(null=True, blank=True)
+    police_hotline = models.IntegerField(null=True, blank=True)
+
+    class Meta:
+        ordering = ['-pk']
+
+    def __str__(self):
+        return f'{self.name} hood'
 
     def create_neighborhood(self):
         self.save()
 
     def delete_neighborhood(self):
         self.delete()
+        
+    def update_neighborhood(self):
+        self.update()
+    def update_occupants(self):
+        self.update()
 
     @classmethod
     def find_neighborhood(cls, neighborhood_id):
         return cls.objects.filter(id=neighborhood_id)
-
-    def __str__(self):
-        return f'{self.name} hood'
 
 #class profile
 class Profile(models.Model):
     profile_photo=CloudinaryField('image')
     name=models.TextField(max_length=50)
     user=models.OneToOneField(User,on_delete=models.CASCADE, related_name='profile')
+    neighborhood = models.ForeignKey(NeighborHood, on_delete=models.CASCADE, null=True)
     location = models.CharField(max_length=50, blank=True, null=True)
-    neighbourhood = models.ForeignKey(NeighbourHood, on_delete=models.SET_NULL, null=True, related_name='members', blank=True)
     email=models.CharField(null=True, max_length=50)
     phone_number=models.IntegerField(null=True)
 
@@ -51,13 +72,50 @@ class Profile(models.Model):
       def __str__(self):
         return f'{self.user.username} profile'
 
-#class business
+class Post(models.Model):
+    title = models.CharField(max_length=50,null=True)
+    content = models.TextField(blank=True, null=True)
+    photo = CloudinaryField("image",blank=True,null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE,null=True)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE,null=True)
+    neighborhood = models.ForeignKey(NeighborHood, on_delete=models.CASCADE, null=True)
+    created_on = models.DateTimeField(auto_now_add=True,null=True)
+    updated_on = models.DateTimeField(auto_now=True,null=True)
+    
+    class Meta:
+        ordering = ['-pk']
+        
+    def __str__(self):
+        return f'{self.title} Post'
+    
+    def delete_post(self):
+        self.delete()
+    
+
+    def create_post(self):
+        self.save()
+        
+    def update_post(self):
+        self.update()
+
+    
+    
 class Business(models.Model):
-    name = models.CharField(max_length=120)
-    email = models.EmailField(max_length=254)
-    description = models.TextField(blank=True)
-    neighbourhood = models.ForeignKey(NeighbourHood, on_delete=models.CASCADE, related_name='business')
-    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='owner')
+    photo = CloudinaryField("image",null=True)
+    name = models.CharField(max_length=50)
+    email = models.EmailField(max_length=50)
+    description = models.TextField(blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE,null=True)
+    location = models.ForeignKey(Location, on_delete=models.CASCADE,null=True)
+    neighborhood = models.ForeignKey(NeighborHood, on_delete=models.CASCADE,null=True)
+    created_on = models.DateTimeField(auto_now_add=True)
+    updated_on = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-pk']
+
+    def __str__(self):
+        return f'{self.name} Business'
 
     def create_business(self):
         self.save()
@@ -65,22 +123,15 @@ class Business(models.Model):
     def delete_business(self):
         self.delete()
 
+    def update_business(self):
+        self.update()
+
     @classmethod
-    def search_business(cls, name):
-        return cls.objects.filter(name__icontains=name).all()
+    def search_by_name(cls, search_term):
+        business = cls.objects.filter(name__icontains=search_term)
+        return business
 
-    def __str__(self):
-        return f'{self.name} Business'    
-
-#class  post
-class Post(models.Model):
-    title = models.CharField(max_length=120, null=True)
-    post = models.TextField()
-    date = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='post_owner')
-    hood = models.ForeignKey(NeighbourHood, on_delete=models.CASCADE, related_name='hood_post')        
-
-
-
-
-# class comments
+    @classmethod
+    def find_business(cls, id):
+        business = cls.objects.get(id=id)
+        return business
