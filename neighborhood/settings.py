@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'hoodapp',
     'bootstrap4',
     'cloudinary',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [
