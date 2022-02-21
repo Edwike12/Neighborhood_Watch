@@ -1,7 +1,59 @@
-{% extends 'base.html'%}
+{%extends "base.html"%}
 {% load bootstrap4 %}
 {% block content %}
 
-<h1>WELCOME TO NEIGBORHOOD WATCH</h1>
+<style>
+    body{
+    font-family: 'Lato', global_font_string;
+    font-weight: 500;
+    background-image: url('https://www.pointproperties.org/wp-content/uploads/2019/05/4-Bedroom-House-Muthaiga-2.jpeg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    color: whitesmoke;
+    min-height: 100vh;
+    
+  
+    
+    }
+    p{
+        color: whitesmoke;
+        font-size: xx-large;
+    }
+    
+</style>
+
+<div class="container-fluid home ">
+   
+
+    <div class="">
+        <h1 class="text-center mt-5">Welcome to The Neighborhood_Watch</h1>
+        <div class="" style=" margin: 2%; padding: 5%;">
+
+        </div>
+        <div class="text-center">
+            
+            
+            <p>
+                All social life, stability, progress, <br>
+                depend upon each man’s confidence in his neighbor, <br>
+                a reliance upon him to do his duty.
+            </p> 
+            
+            <p>"A good neighbor-a found treasure."</p>
+           
+
+           <form action="/create_hood" class="mb-3">
+            <input type="submit" class="btn btn-outline-info bg-info text-white rounded-pill b-text"
+                value="Add Your Neighborhood" />
+           </form>
+
+        </div>
+        
+        
+
+
+    </div>
+</div>
 
 {% endblock %}
